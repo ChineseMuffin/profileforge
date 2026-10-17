@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>{{ css | safe }}</style>
+  </head>
+  <body>
+    <main class="card">
+      <div class="accent" aria-hidden="true"></div>
+      <section class="identity">
+        <h1>{{ profile.name }}</h1>
+        {% if profile.title %}<p class="title">{{ profile.title }}</p>{% endif %}
+        {% if profile.bio %}<p class="bio">{{ profile.bio }}</p>{% endif %}
+      </section>
+      {% if profile.links %}
+      <nav class="links" aria-label="Links">
+        {% for link in profile.links %}
+        <a href="{{ link.url }}" rel="noopener noreferrer">{{ link.label }}</a>
+        {% endfor %}
+      </nav>
+      {% endif %}
+    </main>
+  </body>
+</html>

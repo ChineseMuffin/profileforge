@@ -3,3 +3,12 @@ name = "profileforge"
 version = "0.1.0"
 edition = "2024"
 rust-version = "1.85"
+
+[dependencies]
+chromiumoxide = { version = "=0.9.1", default-features = false }
+futures-util = "=0.3.34"
+serde = { version = "=1.0.229", features = ["derive"] }
+serde_yaml_ng = "=0.10.0"
+tera = "=2.4.0"
+tokio = { version = "=1.53.3", features = ["macros", "rt-multi-thread"] }
+url = "=2.5.8"
