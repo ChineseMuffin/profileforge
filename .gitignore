@@ -1,0 +1,7 @@
+/target/
+/data/
+/output/
+/profiles/
+.env
+.env.*
+!.env.example

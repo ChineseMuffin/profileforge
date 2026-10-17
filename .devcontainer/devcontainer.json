@@ -1,12 +1,8 @@
 {
-  "name": "jikoshoukai",
-  "image": "mcr.microsoft.com/devcontainers/base:bookworm",
-  "features": {
-    "ghcr.io/devcontainers/features/rust:1": {
-      "version": "stable",
-      "profile": "minimal",
-      "components": "clippy,rustfmt"
-    }
+  "name": "ProfileForge",
+  "build": {
+    "dockerfile": "../Dockerfile",
+    "context": ".."
   },
   "remoteUser": "vscode",
   "updateRemoteUserUID": true,
