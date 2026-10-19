@@ -14,11 +14,17 @@
         {% if profile.bio %}<p class="bio">{{ profile.bio }}</p>{% endif %}
       </section>
       {% if profile.links %}
-      <nav class="links" aria-label="Links">
+      <section class="links" aria-label="Links">
         {% for link in profile.links %}
-        <a href="{{ link.url }}" rel="noopener noreferrer">{{ link.label }}</a>
+        <article class="link-card">
+          <div class="link-details">
+            <h2>{{ link.label }}</h2>
+            <p class="link-url">{{ link.url }}</p>
+          </div>
+          <div class="qr-code" role="img" aria-label="QR code for {{ link.label }}">{{ link.qr_svg | safe }}</div>
+        </article>
         {% endfor %}
-      </nav>
+      </section>
       {% endif %}
     </main>
   </body>

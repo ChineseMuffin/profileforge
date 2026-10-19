@@ -6,6 +6,8 @@ use chromiumoxide::{
     page::ScreenshotParams,
 };
 use futures_util::StreamExt;
+use qrcode::{QrCode, render::svg};
+use serde::Serialize;
 use tera::{Context, Tera};
 
 use crate::profile::Profile;
@@ -13,12 +15,55 @@ use crate::profile::Profile;
 const HTML_TEMPLATE: &str = include_str!("../templates/profile.html");
 const CSS: &str = include_str!("../templates/profile.css");
 
+#[derive(Serialize)]
+struct RenderedProfile<'a> {
+    name: &'a str,
+    title: Option<&'a str>,
+    bio: Option<&'a str>,
+    links: Vec<RenderedLink<'a>>,
+}
+
+#[derive(Serialize)]
+struct RenderedLink<'a> {
+    label: &'a str,
+    url: &'a str,
+    qr_svg: String,
+}
+
 pub fn render_html(profile: &Profile) -> Result<String, tera::Error> {
     let mut tera = Tera::default();
     tera.add_raw_template("profile.html", HTML_TEMPLATE)?;
 
+    let links = profile
+        .links
+        .iter()
+        .map(|link| {
+            let qr_svg = QrCode::new(link.url.as_bytes())
+                .map_err(|error| {
+                    tera::Error::message(format!(
+                        "could not generate QR code for link {:?}: {error}",
+                        link.label
+                    ))
+                })?
+                .render::<svg::Color>()
+                .min_dimensions(128, 128)
+                .build();
+            Ok(RenderedLink {
+                label: &link.label,
+                url: &link.url,
+                qr_svg,
+            })
+        })
+        .collect::<Result<Vec<_>, tera::Error>>()?;
+    let rendered_profile = RenderedProfile {
+        name: &profile.name,
+        title: profile.title.as_deref(),
+        bio: profile.bio.as_deref(),
+        links,
+    };
+
     let mut context = Context::new();
-    context.insert("profile", profile);
+    context.insert("profile", &rendered_profile);
     context.insert("css", CSS);
     tera.render("profile.html", &context)
 }
@@ -102,5 +147,33 @@ mod tests {
         assert!(html.contains("Engineer"));
         assert!(html.contains("Builds useful software"));
         assert!(!html.contains("<script>alert(1)</script>"));
+    }
+
+    #[test]
+    fn renders_link_url_and_qr_code() {
+        let profile = Profile {
+            name: "Example".to_owned(),
+            title: None,
+            bio: None,
+            links: vec![
+                crate::profile::ProfileLink {
+                    label: "Project".to_owned(),
+                    url: "https://example.com/project".to_owned(),
+                },
+                crate::profile::ProfileLink {
+                    label: "Source".to_owned(),
+                    url: "https://example.com/source".to_owned(),
+                },
+            ],
+        };
+
+        let html = render_html(&profile).unwrap();
+
+        assert!(html.contains("https://example.com/project"));
+        assert!(html.contains("aria-label=\"QR code for Project\""));
+        assert!(html.contains("https://example.com/source"));
+        assert!(html.contains("aria-label=\"QR code for Source\""));
+        assert_eq!(html.matches("<svg").count(), 2);
+        assert!(html.contains("<path"));
     }
 }

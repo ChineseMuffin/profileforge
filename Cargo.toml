@@ -7,6 +7,7 @@ rust-version = "1.85"
 [dependencies]
 chromiumoxide = { version = "=0.9.1", default-features = false }
 futures-util = "=0.3.34"
+qrcode = { version = "=0.14.1", default-features = false, features = ["svg"] }
 serde = { version = "=1.0.229", features = ["derive"] }
 serde_yaml_ng = "=0.10.0"
 tera = "=2.4.0"

@@ -6,8 +6,8 @@ See [PROJECT_OVERVIEW.md](PROJECT_OVERVIEW.md) for detailed goals and constraint
 ## Current Progress
 
 - Current stage: 5. Quality Management
-- Next: Add a linter and formatter, and pin their versions and configuration
-- Last updated: 2026-10-17
+- Next: Resolve open design questions in issues #1 and #2, then implement the YAML schema contract in issue #3
+- Last updated: 2026-10-19
 
 ## 1. Requirements and Design
 
@@ -16,8 +16,11 @@ See [PROJECT_OVERVIEW.md](PROJECT_OVERVIEW.md) for detailed goals and constraint
 - [x] Decide output requirements such as image size, layout, and fonts
 - [x] Decide on an initial template engine and dependency choices
 - [x] Confirm the policy of not tracking real data or generated images in Git
+- [x] Decide how sample links should be represented in the PNG: show the URL as text and include its QR code
+- [ ] Resolve the remaining issue #1 question: make the name and title examples clearly represent a person's name and professional role
+- [ ] Resolve issue #2: decide how intermediate HTML should be handled
 
-Notes: The initial design uses a required display name and optional title, bio, and links; a 1200×630 landscape image; a CSS layout and system fonts; and Tera as the template engine. Track sample YAML, but exclude real data and generated images.
+Notes: The initial design uses a required display name and optional title, bio, and links; a 1200×630 landscape image; a CSS layout and system fonts; and Tera as the template engine. For issue #1, the sample repository link will be rendered as a visible URL and a QR code in the profile PNG; the template must continue to use the profile's supplied links rather than hardcoding this repository. The sample name/title still need clarification. Issue #2 remains open on intermediate HTML handling.
 
 ## 2. Dev Container and Git Signing
 
@@ -52,8 +55,13 @@ Notes: The initial structure starts with `src/`, adding `templates/`, `examples/
 - [x] Prototype and select a Rust library for controlling Chromium (for example, chromiumoxide), then generate a PNG
 - [x] Allow the input file and output path to be specified
 - [x] Verify that an image can be generated from sample data
+- [x] Update the sample link and PNG template to show a repository URL as text and render its QR code (#1)
+- [ ] Define a JSON Schema as the canonical structural contract for profile YAML (#3)
+- [ ] Validate YAML against the schema before converting it to the Rust profile type (#3)
+- [ ] Keep semantic validation in Rust for rules not covered by the schema, including absolute HTTP/HTTPS URLs (#3)
+- [ ] Test that the schema accepts valid input and rejects structurally invalid input (#3)
 
-Notes: HTML/CSS was chosen; direct drawing with SVG was not. chromiumoxide 0.9.1 was selected, and PNG generation and input validation were implemented. A sample PNG was generated using the host's Chromium (`/usr/bin/chromium`) and verified to be 1200×630. Verification inside the Dev Container was not performed because Docker/Podman is unavailable.
+Notes: HTML/CSS was chosen; direct drawing with SVG was not. chromiumoxide 0.9.1 was selected, and PNG generation and Rust-side semantic input validation were implemented. Profile links now show their URL as text and include an inline SVG QR code generated locally, so no external QR service is used. The sample PNG was generated and visually checked; it is 1200×630 and places the QR code beside the visible repository URL. The user confirmed that the QR code scans successfully. Issue #3 is open; no schema file or schema-based runtime validation exists yet. Verification inside the Dev Container was not performed because Docker/Podman is unavailable.
 
 ## 5. Quality Management
 
@@ -62,7 +70,7 @@ Notes: HTML/CSS was chosen; direct drawing with SVG was not. chromiumoxide 0.9.1
 - [ ] Make tests, linting, and formatting available through Makefile
 - [ ] Verify that failures in each check are correctly reflected in the command result
 
-Notes:
+Notes: The pinned Rust toolchain includes Clippy and rustfmt, but Makefile targets and explicit configuration for linting and formatting are not present yet.
 
 ## 6. GitHub Actions
 
@@ -76,9 +84,10 @@ Notes:
 ## 7. Local Use and Documentation
 
 - [ ] Generate a PNG locally from an arbitrary profile YAML file
+- [ ] Update the sample and documentation to conform to and explain the profile JSON Schema (#3)
 - [x] Confirm that real data and generated images are not tracked by Git
-- [x] Document setup, execution, and verification in the README
-- [x] Document data handling and precautions in the README
-- [x] Record the verification performed and items not verified
+- [ ] Document setup, execution, and verification in the README
+- [ ] Document data handling and precautions in the README
+- [ ] Record the verification performed and items not verified
 
-Notes: The README documents the YAML format, execution, and data handling. `git check-ignore` confirmed that profiles, generated images, and build artifacts are excluded. `make check`, `make test` (6 tests), Clippy, and fmt succeeded. Sample PNG generation with host Chromium was verified. Execution inside the Dev Container has not been verified.
+Notes: The README currently contains only a title, so setup, execution, data-handling, and schema documentation still need to be written. `git check-ignore` confirmed that profiles, generated images, and build artifacts are excluded. `make check`, `make test` (6 tests), Clippy, and fmt succeeded. Sample PNG generation with host Chromium was verified. Execution inside the Dev Container has not been verified.

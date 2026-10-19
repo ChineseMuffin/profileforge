@@ -4,5 +4,5 @@ bio: |
   YAMLから自己紹介画像を生成するためのサンプルです。
   この内容は実在のプロフィールではありません。
 links:
-  - label: Example
-    url: https://example.com/
+  - label: profileforge
+    url: https://github.com/ChineseMuffin/profileforge
