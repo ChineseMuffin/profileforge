@@ -5,7 +5,7 @@ WORKDIR /workspace/profileforge
 FROM rust-base AS dev
 
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends make chromium fonts-ipafont-gothic \
+    && apt-get install -y --no-install-recommends make chromium chromium-sandbox fonts-ipafont-gothic \
     && rm -rf /var/lib/apt/lists/*
 
 FROM rust-base AS builder
@@ -19,9 +19,11 @@ RUN cargo build --release --locked
 FROM debian:bookworm-slim AS runtime
 
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends chromium fonts-ipafont-gothic passwd \
+    && apt-get install -y --no-install-recommends chromium chromium-sandbox fonts-ipafont-gothic passwd \
     && rm -rf /var/lib/apt/lists/* \
-    && useradd --create-home --uid 10001 profileforge
+    && useradd --create-home --uid 10001 profileforge \
+    && mkdir -p /data \
+    && chown profileforge:profileforge /data
 
 ENV CHROMIUM_PATH=/usr/bin/chromium
 
