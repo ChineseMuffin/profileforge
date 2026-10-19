@@ -2,7 +2,8 @@
   "name": "ProfileForge",
   "build": {
     "dockerfile": "../Dockerfile",
-    "context": ".."
+    "context": "..",
+    "target": "dev"
   },
   "remoteUser": "vscode",
   "updateRemoteUserUID": true,
