@@ -2,16 +2,15 @@
 
 ## Generate a PNG with Docker
 
-Build the image and export a PNG to your working directory.
+Build the image and generate a PNG:
 
 ```sh
 docker build -t profileforge .
 mkdir -p docker-output
-chmod 0777 docker-output
-docker run --rm --security-opt seccomp=unconfined \
-	-v "$(pwd):/input:ro" \
-	-v "$(pwd)/docker-output:/output" \
-	profileforge /input/examples/sample.yaml /output/profile.png
+docker run --rm --user "$(id -u):$(id -g)" -e HOME=/tmp \
+  -v "$(pwd):/input:ro" \
+  -v "$(pwd)/docker-output:/output" \
+  profileforge /input/examples/sample.yaml /output/profile.png
 ```
 
-The output is generated at `docker-output/profile.png`. Use `chmod 0777` only for the output directory. `seccomp=unconfined` disables Docker's seccomp restriction, so it should be used only with trusted input.
+The output is generated at `docker-output/profile.png`. The container runs as your current user, so no permission changes are needed. Docker's default seccomp profile remains enabled. This image disables Chromium's own sandbox because some Docker hosts restrict the namespaces it needs; the container still runs as a non-root user, and the input is mounted read-only.

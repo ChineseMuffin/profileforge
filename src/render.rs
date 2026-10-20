@@ -73,6 +73,12 @@ pub async fn render_png(html: &str) -> Result<Vec<u8>, Box<dyn Error>> {
     if let Some(path) = env::var_os("CHROMIUM_PATH") {
         config = config.chrome_executable(PathBuf::from(path));
     }
+    if matches!(
+        env::var("PROFILEFORGE_CHROMIUM_NO_SANDBOX").as_deref(),
+        Ok("1")
+    ) {
+        config = config.arg("no-sandbox");
+    }
     let (mut browser, mut handler) = Browser::launch(
         config
             .window_size(1200, 630)

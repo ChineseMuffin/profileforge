@@ -25,7 +25,8 @@ RUN apt-get update \
     && mkdir -p /data \
     && chown profileforge:profileforge /data
 
-ENV CHROMIUM_PATH=/usr/bin/chromium
+ENV CHROMIUM_PATH=/usr/bin/chromium \
+    PROFILEFORGE_CHROMIUM_NO_SANDBOX=1
 
 COPY --from=builder /workspace/profileforge/target/release/profileforge /usr/local/bin/profileforge
 

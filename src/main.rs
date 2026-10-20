@@ -1,7 +1,15 @@
 mod profile;
 mod render;
 
-use std::{env, error::Error, fs, io, path::PathBuf, process::ExitCode};
+use std::{
+    env, error::Error, fs,
+    io::{self, Write},
+    path::PathBuf,
+    process::ExitCode,
+};
+
+#[cfg(unix)]
+use std::os::unix::fs::{OpenOptionsExt, PermissionsExt};
 
 #[tokio::main]
 async fn main() -> ExitCode {
@@ -44,7 +52,18 @@ async fn run() -> Result<(), Box<dyn Error>> {
     {
         fs::create_dir_all(parent)?;
     }
-    fs::write(&output, png)?;
+    let mut output_options = fs::OpenOptions::new();
+    output_options.write(true).create(true).truncate(true);
+    #[cfg(unix)]
+    output_options.mode(0o644);
+    let mut output_file = output_options.open(&output)?;
+    output_file.write_all(&png)?;
+    #[cfg(unix)]
+    {
+        let mut permissions = output_file.metadata()?.permissions();
+        permissions.set_mode(permissions.mode() & !0o022);
+        output_file.set_permissions(permissions)?;
+    }
     println!("Generated {}", output.display());
     Ok(())
 }
