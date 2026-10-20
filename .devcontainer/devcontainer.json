@@ -7,6 +7,11 @@
   },
   "remoteUser": "vscode",
   "updateRemoteUserUID": true,
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker": {
+      "version": "latest"
+    }
+  },
   "customizations": {
     "vscode": {
       "extensions": [
